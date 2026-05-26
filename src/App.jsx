@@ -12,6 +12,7 @@ import EmailSearchTab from './components/EmailSearch/EmailSearchTab';
 import ReviewTab from './components/Review/ReviewTab';
 import EmailDraftTab from './components/EmailDraft/EmailDraftTab';
 import ExportTab from './components/Export/ExportTab';
+import OutlookAuth from './components/OutlookAuth/OutlookAuth';
 
 const theme = createTheme({
   palette: {
@@ -70,9 +71,7 @@ function App() {
             <Typography variant="h5" component="h1" sx={{ flexGrow: 1, fontWeight: 600 }}>
               CRM Dashboard
             </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              ServiceNow Change Request Management
-            </Typography>
+            <OutlookAuth />
           </Toolbar>
         </AppBar>
 
@@ -89,8 +88,8 @@ function App() {
               <Tab label="📥 Data Import" />
               <Tab label="🔍 Cross-Check" />
               <Tab label="📧 Email Search" />
-              <Tab label="✏️ Review & Comment" />
               <Tab label="✉️ Email Draft" />
+              <Tab label="✏️ Review & Comment" />
               <Tab label="📊 Finalize & Export" />
             </Tabs>
           </Container>
@@ -109,10 +108,10 @@ function App() {
               <EmailSearchTab />
             </TabPanel>
             <TabPanel value={currentTab} index={3}>
-              <ReviewTab />
+              <EmailDraftTab />
             </TabPanel>
             <TabPanel value={currentTab} index={4}>
-              <EmailDraftTab />
+              <ReviewTab />
             </TabPanel>
             <TabPanel value={currentTab} index={5}>
               <ExportTab />

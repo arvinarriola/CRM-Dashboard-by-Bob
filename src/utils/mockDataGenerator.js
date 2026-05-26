@@ -5,16 +5,16 @@ import { format, subDays, subMonths } from 'date-fns';
  */
 
 const CATEGORIES = [
-  'Infrastructure',
-  'Application',
-  'Database',
-  'Network',
-  'Security',
-  'Hardware',
-  'Software'
+  'System A',
+  'System B',
+  'System C',
+  'System D',
+  'System E',
+  'System F',
+  'System G'
 ];
 
-const TITLES = [
+const SHORT_DESCRIPTIONS = [
   'Upgrade server infrastructure',
   'Deploy new application version',
   'Database schema migration',
@@ -55,7 +55,7 @@ const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
 function generateChangeRequest(index, baseDate = new Date()) {
   const owner = OWNERS[Math.floor(Math.random() * OWNERS.length)];
   const category = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
-  const title = TITLES[Math.floor(Math.random() * TITLES.length)];
+  const shortDescription = SHORT_DESCRIPTIONS[Math.floor(Math.random() * SHORT_DESCRIPTIONS.length)];
   const status = STATUSES[Math.floor(Math.random() * STATUSES.length)];
   const priority = PRIORITIES[Math.floor(Math.random() * PRIORITIES.length)];
   
@@ -67,8 +67,8 @@ function generateChangeRequest(index, baseDate = new Date()) {
   return {
     id: `cr-${index}`,
     changeNumber,
-    title: `${title} - ${category}`,
-    description: `This change request involves ${title.toLowerCase()} for the ${category.toLowerCase()} system. The change is required to improve system performance and reliability.`,
+    shortDescription: `${shortDescription} - ${category}`,
+    description: `This change request involves ${shortDescription.toLowerCase()} for the ${category} system. The change is required to improve system performance and reliability.`,
     owner: owner.name,
     ownerEmail: owner.email,
     status,

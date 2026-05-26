@@ -243,18 +243,18 @@ export function generateComparisonReport(comparisonResults) {
     details: {
       duplicates: duplicates.map(d => ({
         changeNumber: d.changeRequest.changeNumber,
-        title: d.changeRequest.title,
+        shortDescription: d.changeRequest.shortDescription,
         status: d.changeRequest.status
       })),
       outdated: outdated.map(o => ({
         changeNumber: o.changeNumber,
-        title: o.title,
+        shortDescription: o.shortDescription,
         daysSinceUpdate: o.daysSinceUpdate,
         lastUpdated: o.lastUpdated
       })),
       statusChanges: statusChanged.map(sc => ({
         changeNumber: sc.changeRequest.changeNumber,
-        title: sc.changeRequest.title,
+        shortDescription: sc.changeRequest.shortDescription,
         oldStatus: sc.oldStatus,
         newStatus: sc.newStatus
       }))
@@ -372,7 +372,7 @@ export function filterChangeRequests(changeRequests, filters) {
       const searchLower = filters.searchText.toLowerCase();
       const matchesSearch = 
         cr.changeNumber.toLowerCase().includes(searchLower) ||
-        cr.title.toLowerCase().includes(searchLower) ||
+        cr.shortDescription.toLowerCase().includes(searchLower) ||
         cr.description.toLowerCase().includes(searchLower) ||
         cr.owner.toLowerCase().includes(searchLower);
       if (!matchesSearch) return false;

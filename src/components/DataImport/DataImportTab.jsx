@@ -433,7 +433,7 @@ function DataImportTab() {
                     {previewData.map((row) => (
                       <TableRow key={row.id} hover>
                         <TableCell>{row.changeNumber}</TableCell>
-                        <TableCell>{row.title}</TableCell>
+                        <TableCell>{row.shortDescription}</TableCell>
                         <TableCell>{row.owner}</TableCell>
                         <TableCell>
                           <Chip label={row.status} size="small" color="primary" />

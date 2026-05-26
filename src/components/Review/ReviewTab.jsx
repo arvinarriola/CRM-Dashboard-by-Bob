@@ -241,9 +241,9 @@ function ReviewTab() {
                         </Box>
                       </TableCell>
                       <TableCell sx={{ maxWidth: 300 }}>
-                        <Tooltip title={cr.title}>
+                        <Tooltip title={cr.shortDescription}>
                           <Typography variant="body2" noWrap>
-                            {cr.title}
+                            {cr.shortDescription}
                           </Typography>
                         </Tooltip>
                       </TableCell>

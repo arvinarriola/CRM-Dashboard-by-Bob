@@ -84,14 +84,21 @@
 
 ---
 
-### 3. 📧 Email Search
+### 3. 📧 Email Search (Outlook Authentication Required)
 
 **Intelligent Email Activity Tracking:**
+- 🔐 **Secure Outlook Connection**: Microsoft authentication required
 - 🔎 Search individual or bulk change requests
 - 📨 View complete email threads
 - 👥 Track participants and dates
 - 🤖 Auto-generate observations from email patterns
 - ➕ Add observations directly to comments
+
+**Security Features:**
+- ⏱️ Rate limiting: 50 searches per hour
+- 🔒 Session timeout: 30 minutes of inactivity
+- ✅ Input validation and sanitization
+- 🛡️ Activity tracking on all operations
 
 **Email Patterns Detected:**
 - Recent activity (last 7 days)
@@ -127,9 +134,10 @@
 
 ---
 
-### 5. ✉️ Email Draft
+### 5. ✉️ Email Draft (Outlook Authentication Required)
 
 **Template-Based Communication:**
+- 🔐 **Secure Outlook Connection**: Microsoft authentication required
 - 📋 Pre-defined email templates:
   - Status Confirmation
   - Cancellation Request
@@ -138,7 +146,15 @@
 - 🎯 Bulk selection of change requests
 - 🔄 Auto-fill change request details
 - 👁️ Preview before sending
+- ⚠️ **Confirmation dialog** before bulk sends
 - ✅ Track contacted status
+
+**Security Features:**
+- ⏱️ Rate limiting: 10 emails per minute, 50 per batch
+- ✅ Email validation (RFC-compliant)
+- 🧹 Content sanitization (removes dangerous HTML/scripts)
+- 🔒 Session timeout protection
+- ⚠️ Required confirmation for bulk operations
 
 **Template Variables:**
 - `[CHANGE_NUMBER]`
@@ -180,6 +196,12 @@
 - 🎨 Material-UI (MUI) components
 - 📊 Recharts for data visualization
 - 🗂️ Zustand for state management
+
+**Authentication & Security:**
+- 🔐 Microsoft MSAL for Outlook integration
+- 🛡️ Custom security utilities (rate limiting, session management)
+- ✅ Input validation and sanitization
+- ⏱️ Activity tracking and timeout management
 
 **Data Processing:**
 - 📑 SheetJS (xlsx) for Excel handling
@@ -266,9 +288,112 @@
 
 ---
 
-## 🆕 Recent Enhancements
+## 🆕 Recent Enhancements (May 2026)
 
-### Historical Comments Transfer Feature
+### 0. Security Guard Rails for Email Features
+
+**Problem Solved:**
+- Email features vulnerable to abuse and hijacking
+- No protection against rate limiting or spam
+- Lack of session management and timeout
+- No validation of email content
+
+**Solution Implemented:**
+1. **Rate Limiting**
+   - Email searches: 50 per hour
+   - Bulk sends: 10 per minute, 50 per batch
+   - Prevents account abuse and API overload
+
+2. **Session Management**
+   - 30-minute inactivity timeout
+   - Automatic logout on session expiration
+   - Activity tracking on all operations
+   - Periodic session validation
+
+3. **Input Validation**
+   - RFC-compliant email address validation
+   - Content sanitization (removes dangerous HTML/scripts)
+   - Empty content prevention
+   - Bulk operation limits
+
+4. **User Confirmation**
+   - Required confirmation dialogs for bulk operations
+   - Clear display of recipient count and content
+   - Cancel option before committing
+   - Security notices in dialogs
+
+5. **Authentication Requirements**
+   - Email features blocked until Outlook connected
+   - Clear messaging about authentication needs
+   - Visual indicators for connection status
+   - Demo mode for testing
+
+**Impact:**
+- Protected against email account hijacking
+- Prevented abuse and spam
+- Enhanced user trust and security
+- Maintained smooth user experience
+
+---
+
+### 1. ServiceNow Status Workflow Support
+
+**Enhancement:**
+- Updated status options to support both standard and normal change request workflows
+- New statuses: **New, Assess, Authorize, Scheduled, Implement, Review, Closed, Cancelled**
+- Color-coded status indicators for better visibility
+- Automatic status tracking across all components
+
+**Impact:**
+- Full alignment with ServiceNow change management processes
+- Support for both standard and normal change types
+- Improved workflow visibility and tracking
+
+### 2. UI/UX Improvements
+
+**Column Header Updates:**
+- Changed "Title" to "Short Description" across all components
+- Consistent terminology with ServiceNow field names
+- Better alignment with industry standards
+
+**Collapsible Sections:**
+- Added expand/collapse functionality for "Import from ServiceNow" section
+- Added expand/collapse functionality for "Uploaded Historical Files" section
+- Default state set to minimized for cleaner interface
+- Reduces visual clutter when managing multiple files
+
+**Impact:**
+- Cleaner, more organized interface
+- Better screen space utilization
+- Improved user experience for large datasets
+
+### 3. Enhanced Comment Editing
+
+**New Features:**
+- Edit button in Comment Details dialog
+- Large text area (8 rows) for comfortable editing
+- Edit/Save/Cancel functionality within dialog
+- No need to edit in cramped table cells
+
+**Impact:**
+- Easier comment management
+- Better user experience for detailed observations
+- Reduced errors from small editing spaces
+
+### 4. Email Draft Enhancements
+
+**Clarification Features:**
+- Added explanatory note for multiple email recipients
+- Clear indication that each recipient gets personalized email
+- Different messages for single vs. multiple recipients
+- Fixed dropdown label overlap issue
+
+**Impact:**
+- Reduced user confusion about bulk email functionality
+- Better understanding of personalization features
+- Improved UI polish and professionalism
+
+### 5. Historical Comments Transfer Feature
 
 **Problem Solved:**
 - Comments from previous reviews were lost
@@ -296,6 +421,19 @@
 - Preserves institutional knowledge
 - Reduces duplicate work
 - Maintains review continuity
+
+### 6. Bug Fixes
+
+**Resolved Issues:**
+- Fixed missing Checkbox import in DataImportTab
+- Fixed email template dropdown label overlap
+- Improved form control accessibility
+- Enhanced Material-UI component integration
+
+**Impact:**
+- More stable application
+- Better user experience
+- Improved accessibility
 
 ---
 
@@ -431,12 +569,21 @@
 
 ## 🔒 Security & Compliance
 
-### Data Handling
+### Current Security Features
 
+**Email Security Guard Rails:**
+- ⏱️ **Rate Limiting**: Prevents abuse (50 searches/hour, 10 sends/minute)
+- 🔒 **Session Management**: 30-minute auto-timeout with activity tracking
+- ✅ **Input Validation**: Email validation and content sanitization
+- ⚠️ **Confirmation Dialogs**: Required for bulk operations
+- 🔐 **Authentication**: Email features require Outlook connection
+
+**Data Handling:**
 - 🔐 All data stored in browser memory
 - 🚫 No server-side storage (demo mode)
 - 🔒 No external API calls (demo mode)
 - ✅ GDPR-ready architecture
+- 🛡️ Session data cleared on logout/timeout
 
 ### Future Security Features
 
@@ -444,6 +591,7 @@
 - 📝 Audit logging
 - 🔐 Encrypted data storage
 - 🛡️ SOC 2 compliance
+- 🔐 Two-factor authentication (2FA)
 
 ---
 
@@ -566,4 +714,4 @@ Let's discuss how this can benefit your team!
 
 ---
 
-*Version 1.0.0 | Last Updated: 2024 | Status: Demo/Prototype*
+*Version 1.2.0 | Last Updated: May 2026 | Status: Demo/Prototype with Security Features*

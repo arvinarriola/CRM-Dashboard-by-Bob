@@ -271,7 +271,7 @@ function CrossCheckTab() {
                           {comparisonResults.duplicates.map((dup, index) => (
                             <TableRow key={index} hover>
                               <TableCell>{dup.changeRequest.changeNumber}</TableCell>
-                              <TableCell>{dup.changeRequest.title}</TableCell>
+                              <TableCell>{dup.changeRequest.shortDescription}</TableCell>
                               <TableCell>
                                 <Chip 
                                   label={dup.changeRequest.status} 
@@ -323,7 +323,7 @@ function CrossCheckTab() {
                           {comparisonResults.outdated.map((outdated, index) => (
                             <TableRow key={index} hover>
                               <TableCell>{outdated.changeNumber}</TableCell>
-                              <TableCell>{outdated.title}</TableCell>
+                              <TableCell>{outdated.shortDescription}</TableCell>
                               <TableCell>
                                 <Chip 
                                   label={outdated.status} 
@@ -377,7 +377,7 @@ function CrossCheckTab() {
                           {comparisonResults.statusChanged.map((change, index) => (
                             <TableRow key={index} hover>
                               <TableCell>{change.changeRequest.changeNumber}</TableCell>
-                              <TableCell>{change.changeRequest.title}</TableCell>
+                              <TableCell>{change.changeRequest.shortDescription}</TableCell>
                               <TableCell>
                                 <Chip 
                                   label={change.oldStatus} 

@@ -8,10 +8,20 @@ This application automates the time-consuming process of reviewing change reques
 
 - **Data Import**: Upload Excel files or parse ServiceNow URLs
 - **Cross-Check Analysis**: Compare current vs historical data to identify duplicates and outdated requests
-- **Email Search**: Search mock Outlook emails for change request activity
+- **Email Search**: Search Outlook emails for change request activity (with Outlook authentication)
 - **Review & Comment**: Add observations and categorize actions for each change request
-- **Email Draft**: Generate and send emails to change request owners
+- **Email Draft**: Generate and send emails to change request owners (with Outlook authentication)
 - **Export**: Generate comprehensive Excel reports with all updates
+
+## 🔒 Security Features
+
+This application includes comprehensive security guard rails to protect your Outlook account and emails:
+
+- **Rate Limiting**: Prevents abuse with limits on email searches (50/hour) and bulk sends (10/minute)
+- **Session Management**: 30-minute auto-timeout with activity tracking
+- **Input Validation**: Email address validation and content sanitization
+- **Confirmation Dialogs**: Required confirmation before bulk email operations
+- **Authentication Required**: Email features blocked until Outlook connection is established
 
 ## ✨ Features
 
@@ -29,12 +39,15 @@ This application automates the time-consuming process of reviewing change reques
 - Track status changes over time
 - Generate actionable recommendations
 
-### 📧 Email Search
+### 📧 Email Search (Outlook Authentication Required)
+- **Outlook Connection**: Secure authentication with Microsoft Outlook
 - Search individual change requests by number
 - Bulk search all change requests for email activity
 - View email threads with dates and participants
 - Automatically generate observations based on email patterns
 - Add observations directly to change request comments
+- **Security**: Rate limited to 50 searches per hour
+- **Session Protection**: 30-minute auto-timeout with activity tracking
 
 ### ✏️ Review & Comment
 - Editable data grid with all change requests
@@ -43,13 +56,21 @@ This application automates the time-consuming process of reviewing change reques
 - Advanced filtering (status, priority, outdated, duplicates, etc.)
 - Search by change number, title, or owner
 
-### ✉️ Email Draft
+### ✉️ Email Draft (Outlook Authentication Required)
+- **Outlook Connection**: Secure authentication with Microsoft Outlook
 - Select multiple change requests to contact
 - Choose from pre-defined email templates
 - Write custom emails
 - Preview emails before sending
+- **Confirmation Dialog**: Required confirmation before sending bulk emails
 - Track contacted status
 - Templates auto-fill change request details
+- **Security Features**:
+  - Rate limiting: Maximum 10 emails per minute
+  - Bulk validation: Maximum 50 recipients per batch
+  - Email validation: RFC-compliant address checking
+  - Content sanitization: Removes dangerous HTML/scripts
+  - Session timeout protection
 
 ### 📊 Finalize & Export
 - View summary statistics and data visualizations
@@ -209,6 +230,8 @@ change-manager-dashboard/
 - **Excel Processing**: SheetJS (xlsx)
 - **Date Handling**: date-fns
 - **Build Tool**: Vite
+- **Authentication**: Microsoft MSAL (for Outlook integration)
+- **Security**: Custom rate limiting and session management
 
 ## 📊 Sample Workflow
 
@@ -275,20 +298,61 @@ change-manager-dashboard/
 ## 📝 Notes
 
 - This is a **demo application** with simulated features
-- Email sending is **simulated** (no actual emails sent)
+- Email sending is **simulated** (no actual emails sent in demo mode)
 - ServiceNow integration uses **mock data**
 - All data is stored in **browser memory** (not persistent)
+- **Outlook authentication** is currently in demo mode (simulated)
+- **Security features** are fully implemented and active
+
+## 🔐 Security & Privacy
+
+### Email Security Guard Rails
+
+The application implements multiple layers of security to protect your Outlook account:
+
+1. **Rate Limiting**
+   - Email searches: 50 per hour
+   - Bulk email sends: 10 per minute, 50 per batch
+   - Prevents account abuse and API overload
+
+2. **Session Management**
+   - 30-minute inactivity timeout
+   - Automatic logout on session expiration
+   - Activity tracking on all operations
+
+3. **Input Validation**
+   - RFC-compliant email address validation
+   - Content sanitization (removes dangerous HTML/scripts)
+   - Empty content prevention
+
+4. **User Confirmation**
+   - Required confirmation dialogs for bulk operations
+   - Clear display of recipient count and content
+   - Cancel option before committing
+
+5. **Authentication Requirements**
+   - Email features blocked until Outlook connected
+   - Clear messaging about authentication needs
+   - Visual indicators for connection status
+
+### Data Privacy
+
+- All data processing happens in your browser
+- No data is sent to external servers (except Outlook API in production)
+- Session data is cleared on logout or timeout
+- No persistent storage of sensitive information
 
 ## 🚀 Future Enhancements
 
 - Real ServiceNow API integration
-- Actual Outlook/Exchange email integration
+- Production Outlook/Exchange email integration
 - Database persistence
-- User authentication
+- User authentication and authorization
 - Multi-user collaboration
 - Advanced analytics and reporting
 - Mobile responsive design
 - Dark mode theme
+- Enhanced security features (2FA, audit logs)
 
 ## 📄 License
 

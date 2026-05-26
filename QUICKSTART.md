@@ -51,6 +51,8 @@ The application is now running with:
 - ✅ 75 pre-loaded mock change requests
 - ✅ Mock email data
 - ✅ All 6 tabs fully functional
+- ✅ Outlook authentication (demo mode)
+- ✅ Security features enabled
 - ✅ Ready for immediate demo
 
 ## 📱 Using the App
@@ -59,12 +61,21 @@ The application is now running with:
 
 1. **Data Import Tab** - View pre-loaded data (already there!)
 2. **Cross-Check Tab** - Click "Run Comparison" button
-3. **Email Search Tab** - Click "Search All" button
+3. **Email Search Tab** - Click "Connect Outlook" (demo mode), then "Search All"
 4. **Review & Comment Tab** - Click edit icon to add comments
-5. **Email Draft Tab** - Select requests and choose a template
+5. **Email Draft Tab** - Connect Outlook, select requests, choose template
 6. **Finalize & Export Tab** - Click "Export to Excel" button
 
-## 🛑 Stopping the App
+### 🔒 Security Features
+
+The app includes built-in security protection:
+- **Rate Limiting**: Prevents email abuse (50 searches/hour, 10 sends/minute)
+- **Session Timeout**: Auto-logout after 30 minutes of inactivity
+- **Confirmation Dialogs**: Required before bulk email operations
+- **Input Validation**: Email addresses and content are validated
+- **Authentication**: Email features require Outlook connection
+
+##  Stopping the App
 
 Press `Ctrl + C` in the terminal to stop the development server.
 

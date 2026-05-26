@@ -60,6 +60,8 @@ Your project structure is complete with:
 ✅ Utility functions (Excel parsing, comparison, email matching)
 ✅ Mock data generators
 ✅ Material-UI styling
+✅ Outlook authentication (demo mode)
+✅ Security features (rate limiting, session management)
 ✅ Complete functionality
 
 ## Project Files Created
@@ -70,6 +72,7 @@ change-manager-dashboard/
 ├── vite.config.js           ✅ Build configuration
 ├── index.html               ✅ Entry HTML
 ├── README.md                ✅ Documentation
+├── QUICKSTART.md            ✅ Quick start guide
 ├── SETUP_INSTRUCTIONS.md    ✅ This file
 └── src/
     ├── main.jsx             ✅ App entry point
@@ -77,25 +80,28 @@ change-manager-dashboard/
     ├── types/
     │   └── index.js         ✅ Type definitions
     ├── store/
-    │   └── useStore.js      ✅ State management
+    │   └── useStore.js      ✅ State management (with session tracking)
     ├── utils/
     │   ├── mockDataGenerator.js    ✅ Mock data
     │   ├── excelParser.js          ✅ Excel handling
     │   ├── comparisonEngine.js     ✅ Data comparison
-    │   └── emailMatcher.js         ✅ Email search
+    │   ├── emailMatcher.js         ✅ Email search
+    │   └── emailSecurity.js        ✅ Security utilities
     └── components/
         ├── DataImport/
         │   └── DataImportTab.jsx   ✅ Import tab
         ├── CrossCheck/
         │   └── CrossCheckTab.jsx   ✅ Cross-check tab
         ├── EmailSearch/
-        │   └── EmailSearchTab.jsx  ✅ Email search tab
+        │   └── EmailSearchTab.jsx  ✅ Email search tab (with security)
         ├── Review/
         │   └── ReviewTab.jsx       ✅ Review tab
         ├── EmailDraft/
-        │   └── EmailDraftTab.jsx   ✅ Email draft tab
-        └── Export/
-            └── ExportTab.jsx       ✅ Export tab
+        │   └── EmailDraftTab.jsx   ✅ Email draft tab (with security)
+        ├── Export/
+        │   └── ExportTab.jsx       ✅ Export tab
+        └── OutlookAuth/
+            └── OutlookAuth.jsx     ✅ Outlook authentication
 ```
 
 ## Next Steps
@@ -113,11 +119,13 @@ Once running, you can immediately:
 1. ✅ View 75 pre-loaded mock change requests
 2. ✅ Upload Excel files
 3. ✅ Run cross-check analysis
-4. ✅ Search email activity
-5. ✅ Add comments and categorize actions
-6. ✅ Draft emails to owners
-7. ✅ Export to Excel with all updates
-8. ✅ View charts and statistics
+4. ✅ Connect Outlook (demo mode)
+5. ✅ Search email activity (with rate limiting)
+6. ✅ Add comments and categorize actions
+7. ✅ Draft emails to owners (with confirmation dialogs)
+8. ✅ Export to Excel with all updates
+9. ✅ View charts and statistics
+10. ✅ Experience security features (session timeout, validation)
 
 ## Troubleshooting
 
@@ -144,6 +152,35 @@ The application includes:
 - **All statuses**: New, Assess, Authorize, Scheduled, Implement, Review, Closed, Cancelled
 - **All priorities**: Critical, High, Medium, Low
 - **Multiple categories**: Infrastructure, Application, Database, etc.
+
+## 🔒 Security Features
+
+The application includes comprehensive security guard rails:
+
+### Rate Limiting
+- **Email Search**: 50 searches per hour
+- **Bulk Email Send**: 10 emails per minute, 50 per batch
+- Prevents account abuse and API overload
+
+### Session Management
+- **Auto-timeout**: 30 minutes of inactivity
+- **Activity tracking**: Updates on every operation
+- **Automatic logout**: Clears authentication on timeout
+
+### Input Validation
+- **Email validation**: RFC-compliant address checking
+- **Content sanitization**: Removes dangerous HTML/scripts
+- **Bulk limits**: Maximum 50 recipients per send
+
+### User Confirmation
+- **Confirmation dialogs**: Required before bulk operations
+- **Clear information**: Shows recipient count and content
+- **Cancel option**: Review before committing
+
+### Authentication
+- **Blocked state**: Email features disabled until connected
+- **Clear messaging**: Explains authentication requirements
+- **Visual indicators**: Connection status display
 
 ## Support
 

@@ -53,7 +53,7 @@ function normalizeChangeRequest(row, index) {
   // Map common column names to our structure
   const columnMappings = {
     changeNumber: ['Change Number', 'Number', 'CR Number', 'Change ID', 'changeNumber'],
-    title: ['Title', 'Short Description', 'Summary', 'Description', 'title'],
+    shortDescription: ['Short Description', 'Title', 'Summary', 'shortDescription'],
     owner: ['Owner', 'Assigned To', 'Assignee', 'owner'],
     ownerEmail: ['Owner Email', 'Email', 'Assignee Email', 'ownerEmail'],
     status: ['Status', 'State', 'status'],
@@ -70,7 +70,7 @@ function normalizeChangeRequest(row, index) {
   const normalized = {
     id: `imported-${index}`,
     changeNumber: findValue(row, columnMappings.changeNumber) || `CHG${String(index).padStart(7, '0')}`,
-    title: findValue(row, columnMappings.title) || 'Untitled Change Request',
+    shortDescription: findValue(row, columnMappings.shortDescription) || 'Untitled Change Request',
     description: findValue(row, columnMappings.description) || '',
     owner: findValue(row, columnMappings.owner) || 'Unknown',
     ownerEmail: findValue(row, columnMappings.ownerEmail) || 'unknown@company.com',
@@ -188,7 +188,7 @@ export function exportToExcel(changeRequests, filename = 'change-requests-export
   // Transform data for export
   const exportData = changeRequests.map(cr => ({
     'Change Number': cr.changeNumber,
-    'Title': cr.title,
+    'Short Description': cr.shortDescription,
     'Description': cr.description,
     'Owner': cr.owner,
     'Owner Email': cr.ownerEmail,

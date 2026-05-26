@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -29,6 +29,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import AddCommentIcon from '@mui/icons-material/AddComment';
 import { bulkSearchEmails, getEmailStatistics } from '../../utils/emailMatcher';
+import { checkRateLimit, recordOperation } from '../../utils/emailSecurity';
 import useStore from '../../store/useStore';
 import { format } from 'date-fns';
 
@@ -44,12 +45,43 @@ function EmailSearchTab() {
   const updateChangeRequest = useStore((state) => state.updateChangeRequest);
   const setSuccessMessage = useStore((state) => state.setSuccessMessage);
   const setError = useStore((state) => state.setError);
+  const updateLastActivity = useStore((state) => state.updateLastActivity);
+  const checkSessionTimeout = useStore((state) => state.checkSessionTimeout);
+
+  // Check session timeout periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkSessionTimeout();
+    }, 60000); // Check every minute
+    
+    return () => clearInterval(interval);
+  }, [checkSessionTimeout]);
+  const outlookAuth = useStore((state) => state.outlookAuth);
+  const setCurrentTab = useStore((state) => state.setCurrentTab);
 
   const handleBulkSearch = () => {
+    // Check session
+    if (!checkSessionTimeout()) {
+      return;
+    }
+
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit('emailSearch');
+    if (!rateLimitCheck.allowed) {
+      setError(rateLimitCheck.message);
+      return;
+    }
+
     if (changeRequests.length === 0) {
       setError('No change requests to search. Please import data first.');
       return;
     }
+
+    // Update activity
+    updateLastActivity();
+    
+    // Record operation
+    recordOperation('emailSearch');
 
     setSearching(true);
     
@@ -63,12 +95,24 @@ function EmailSearchTab() {
   };
 
   const handleSearchSpecific = () => {
+    // Check session
+    if (!checkSessionTimeout()) {
+      return;
+    }
+
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit('emailSearch');
+    if (!rateLimitCheck.allowed) {
+      setError(rateLimitCheck.message);
+      return;
+    }
+
     if (!searchTerm.trim()) {
       setError('Please enter a change request number to search');
       return;
     }
 
-    const cr = changeRequests.find(c => 
+    const cr = changeRequests.find(c =>
       c.changeNumber.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -76,6 +120,12 @@ function EmailSearchTab() {
       setError('Change request not found');
       return;
     }
+
+    // Update activity
+    updateLastActivity();
+    
+    // Record operation
+    recordOperation('emailSearch');
 
     setSelectedCR(cr);
     const results = bulkSearchEmails([cr], allEmails);
@@ -106,7 +156,34 @@ function EmailSearchTab() {
         📧 Email Search
       </Typography>
 
-      <Grid container spacing={3}>
+      {/* Outlook Connection Required */}
+      {!outlookAuth.isAuthenticated ? (
+        <Paper sx={{ p: 6, textAlign: 'center', bgcolor: 'background.paper' }}>
+          <EmailIcon sx={{ fontSize: 80, color: 'warning.main', mb: 3 }} />
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+            Outlook Connection Required
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
+            To search emails from your Outlook account, please connect your Outlook account using the "Connect Outlook" button in the header.
+            This feature requires authentication to access your email data.
+          </Typography>
+          <Alert severity="info" sx={{ maxWidth: 600, mx: 'auto', mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Demo Mode:</strong> Currently showing mock email data for demonstration purposes.
+              Connect your Outlook account to search real emails.
+            </Typography>
+          </Alert>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<EmailIcon />}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            Connect Outlook to Continue
+          </Button>
+        </Paper>
+      ) : (
+        <Grid container spacing={3}>
         {/* Search Controls */}
         <Grid item xs={12}>
           <Paper sx={{ p: 3 }}>
@@ -227,7 +304,7 @@ function EmailSearchTab() {
                           {changeNumber}
                         </Typography>
                         <Typography sx={{ flexGrow: 1, color: 'text.secondary' }}>
-                          {cr.title}
+                          {cr.shortDescription}
                         </Typography>
                         <Chip 
                           label={`${result.emails.length} emails`}
@@ -337,7 +414,8 @@ function EmailSearchTab() {
             </Typography>
           </Alert>
         </Grid>
-      </Grid>
+        </Grid>
+      )}
     </Box>
   );
 }

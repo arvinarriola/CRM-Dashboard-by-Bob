@@ -7,7 +7,7 @@
  * @typedef {Object} ChangeRequest
  * @property {string} id - Unique identifier
  * @property {string} changeNumber - Change request number (e.g., CHG0012345)
- * @property {string} title - Title of the change request
+ * @property {string} shortDescription - Short description of the change request
  * @property {string} description - Detailed description
  * @property {string} owner - Owner name
  * @property {string} ownerEmail - Owner email address

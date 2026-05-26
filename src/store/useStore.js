@@ -11,6 +11,16 @@ const useStore = create((set, get) => ({
   allEmails: [],
   emailTemplates: generateEmailTemplates(),
   
+  // Outlook authentication state
+  outlookAuth: {
+    isAuthenticated: false,
+    userEmail: null,
+    userName: null,
+    accessToken: null,
+    lastActivity: null,
+    sessionTimeout: 30 * 60 * 1000, // 30 minutes
+  },
+  
   // UI state
   currentTab: 0,
   loading: false,
@@ -46,6 +56,54 @@ const useStore = create((set, get) => ({
   setSuccessMessage: (message) => set({ successMessage: message }),
   
   clearMessages: () => set({ error: null, successMessage: null }),
+  
+  // Outlook authentication actions
+  setOutlookAuth: (authData) => set({
+    outlookAuth: {
+      ...authData,
+      lastActivity: Date.now()
+    }
+  }),
+  
+  updateLastActivity: () => {
+    const outlookAuth = get().outlookAuth;
+    if (outlookAuth.isAuthenticated) {
+      set({
+        outlookAuth: {
+          ...outlookAuth,
+          lastActivity: Date.now()
+        }
+      });
+    }
+  },
+  
+  checkSessionTimeout: () => {
+    const outlookAuth = get().outlookAuth;
+    if (outlookAuth.isAuthenticated && outlookAuth.lastActivity) {
+      const now = Date.now();
+      const elapsed = now - outlookAuth.lastActivity;
+      if (elapsed > outlookAuth.sessionTimeout) {
+        get().clearOutlookAuth();
+        get().setError('Session expired. Please sign in again.');
+        return false;
+      }
+    }
+    return true;
+  },
+  
+  clearOutlookAuth: () => {
+    // Clear sensitive data
+    set({
+      outlookAuth: {
+        isAuthenticated: false,
+        userEmail: null,
+        userName: null,
+        accessToken: null,
+        lastActivity: null,
+        sessionTimeout: 30 * 60 * 1000,
+      }
+    });
+  },
   
   // Initialize with mock data
   initializeMockData: () => {
@@ -206,7 +264,7 @@ const useStore = create((set, get) => ({
         const searchLower = filters.searchText.toLowerCase();
         const matchesSearch = 
           cr.changeNumber.toLowerCase().includes(searchLower) ||
-          cr.title.toLowerCase().includes(searchLower) ||
+          cr.shortDescription.toLowerCase().includes(searchLower) ||
           cr.description.toLowerCase().includes(searchLower) ||
           cr.owner.toLowerCase().includes(searchLower);
         if (!matchesSearch) {

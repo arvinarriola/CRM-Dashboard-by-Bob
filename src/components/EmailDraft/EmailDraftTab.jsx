@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Paper,
@@ -31,13 +31,16 @@ import EmailIcon from '@mui/icons-material/Email';
 import SendIcon from '@mui/icons-material/Send';
 import PreviewIcon from '@mui/icons-material/Preview';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WarningIcon from '@mui/icons-material/Warning';
 import useStore from '../../store/useStore';
+import { validateBulkEmailOperation, checkRateLimit, recordOperation, sanitizeEmailContent } from '../../utils/emailSecurity';
 import { format } from 'date-fns';
 
 function EmailDraftTab() {
   const [selectedCRs, setSelectedCRs] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [previewEmail, setPreviewEmail] = useState(null);
   const [customSubject, setCustomSubject] = useState('');
   const [customBody, setCustomBody] = useState('');
@@ -47,6 +50,19 @@ function EmailDraftTab() {
   const bulkMarkAsContacted = useStore((state) => state.bulkMarkAsContacted);
   const setSuccessMessage = useStore((state) => state.setSuccessMessage);
   const setError = useStore((state) => state.setError);
+  const outlookAuth = useStore((state) => state.outlookAuth);
+  const setCurrentTab = useStore((state) => state.setCurrentTab);
+  const updateLastActivity = useStore((state) => state.updateLastActivity);
+  const checkSessionTimeout = useStore((state) => state.checkSessionTimeout);
+
+  // Check session timeout periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkSessionTimeout();
+    }, 60000); // Check every minute
+    
+    return () => clearInterval(interval);
+  }, [checkSessionTimeout]);
 
   // Filter to show only non-closed/cancelled requests
   const availableRequests = useMemo(() => 
@@ -73,11 +89,11 @@ function EmailDraftTab() {
 
     const subject = template.subject
       .replace('[CHANGE_NUMBER]', cr.changeNumber)
-      .replace('[TITLE]', cr.title);
+      .replace('[TITLE]', cr.shortDescription);
 
     const body = template.body
       .replace(/\[CHANGE_NUMBER\]/g, cr.changeNumber)
-      .replace(/\[TITLE\]/g, cr.title)
+      .replace(/\[TITLE\]/g, cr.shortDescription)
       .replace(/\[OWNER_NAME\]/g, cr.owner)
       .replace(/\[LAST_UPDATED\]/g, format(new Date(cr.lastUpdated), 'MMMM dd, yyyy'));
 
@@ -120,10 +136,65 @@ function EmailDraftTab() {
   };
 
   const handleSendEmails = () => {
+    // Check session
+    if (!checkSessionTimeout()) {
+      return;
+    }
+
     if (selectedCRs.length === 0) {
       setError('Please select at least one change request');
       return;
     }
+
+    // Get email addresses
+    const recipients = selectedCRs.map(id => {
+      const cr = changeRequests.find(c => c.id === id);
+      return cr?.ownerEmail;
+    }).filter(Boolean);
+
+    // Get subject and body
+    let subject = customSubject;
+    let body = customBody;
+    
+    if (selectedTemplate) {
+      const template = emailTemplates.find(t => t.id === selectedTemplate);
+      const cr = changeRequests.find(c => c.id === selectedCRs[0]);
+      if (template && cr) {
+        const email = generateEmail(cr, template);
+        subject = email.subject;
+        body = email.body;
+      }
+    }
+
+    // Validate bulk operation
+    const validation = validateBulkEmailOperation(recipients, subject, body);
+    
+    if (!validation.isValid) {
+      setError(validation.errors.join('. '));
+      return;
+    }
+
+    // Check rate limit
+    const rateLimitCheck = checkRateLimit('bulkSend');
+    if (!rateLimitCheck.allowed) {
+      setError(rateLimitCheck.message);
+      return;
+    }
+
+    // Show confirmation dialog
+    setConfirmDialogOpen(true);
+  };
+
+  const confirmSendEmails = () => {
+    // Update activity
+    updateLastActivity();
+    
+    // Record operation
+    recordOperation('bulkSend');
+
+    // Sanitize content
+    const sanitizedSubject = sanitizeEmailContent(customSubject);
+    const sanitizedBody = sanitizeEmailContent(customBody);
 
     // Simulate sending emails
     bulkMarkAsContacted(selectedCRs);
@@ -132,6 +203,8 @@ function EmailDraftTab() {
     setSelectedTemplate('');
     setCustomSubject('');
     setCustomBody('');
+    setConfirmDialogOpen(false);
+    setPreviewDialogOpen(false);
   };
 
   const selectedCount = selectedCRs.length;
@@ -143,7 +216,34 @@ function EmailDraftTab() {
         ✉️ Email Draft
       </Typography>
 
-      <Grid container spacing={3}>
+      {/* Outlook Connection Required */}
+      {!outlookAuth.isAuthenticated ? (
+        <Paper sx={{ p: 6, textAlign: 'center', bgcolor: 'background.paper' }}>
+          <SendIcon sx={{ fontSize: 80, color: 'warning.main', mb: 3 }} />
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+            Outlook Connection Required
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 600, mx: 'auto' }}>
+            To send emails from your Outlook account, please connect your Outlook account using the "Connect Outlook" button in the header.
+            This feature requires authentication to send emails on your behalf.
+          </Typography>
+          <Alert severity="info" sx={{ maxWidth: 600, mx: 'auto', mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Demo Mode:</strong> Currently in demo mode - emails will be simulated but not actually sent.
+              Connect your Outlook account to send real emails.
+            </Typography>
+          </Alert>
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<EmailIcon />}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            Connect Outlook to Continue
+          </Button>
+        </Paper>
+      ) : (
+        <Grid container spacing={3}>
         {/* Statistics */}
         <Grid item xs={12}>
           <Grid container spacing={2}>
@@ -312,7 +412,7 @@ function EmailDraftTab() {
                       <TableCell>{cr.changeNumber}</TableCell>
                       <TableCell sx={{ maxWidth: 300 }}>
                         <Typography variant="body2" noWrap>
-                          {cr.title}
+                          {cr.shortDescription}
                         </Typography>
                       </TableCell>
                       <TableCell>{cr.owner}</TableCell>
@@ -358,7 +458,8 @@ function EmailDraftTab() {
             </Typography>
           </Alert>
         </Grid>
-      </Grid>
+        </Grid>
+      )}
 
       {/* Email Preview Dialog */}
       <Dialog open={previewDialogOpen} onClose={() => setPreviewDialogOpen(false)} maxWidth="md" fullWidth>
@@ -412,6 +513,54 @@ function EmailDraftTab() {
             handleSendEmails();
           }}>
             Send Now
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Send Confirmation Dialog */}
+      <Dialog open={confirmDialogOpen} onClose={() => setConfirmDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <WarningIcon color="warning" />
+          Confirm Bulk Email Send
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              You are about to send {selectedCount} email(s)
+            </Typography>
+            <Typography variant="body2">
+              This action will send emails to all selected change request owners. Please review:
+            </Typography>
+          </Alert>
+          
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              <strong>Recipients:</strong> {selectedCount} change request owner(s)
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>
+              <strong>Template:</strong> {selectedTemplate ? emailTemplates.find(t => t.id === selectedTemplate)?.name : 'Custom Email'}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              <strong>Subject:</strong> {customSubject || (selectedTemplate && previewEmail ? previewEmail.subject : 'N/A')}
+            </Typography>
+          </Box>
+
+          <Alert severity="info" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              <strong>Security Note:</strong> This operation is rate-limited and validated to protect your account from abuse.
+              Each email will be personalized with the recipient's change request details.
+            </Typography>
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDialogOpen(false)}>Cancel</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SendIcon />}
+            onClick={confirmSendEmails}
+          >
+            Confirm & Send
           </Button>
         </DialogActions>
       </Dialog>

@@ -301,15 +301,6 @@ function ExportTab() {
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={includeFilters.duplicates}
-                        onChange={() => handleFilterChange('duplicates')}
-                      />
-                    }
-                    label={`Only Duplicates (${statistics.duplicates})`}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
                         checked={includeFilters.contacted}
                         onChange={() => handleFilterChange('contacted')}
                       />
