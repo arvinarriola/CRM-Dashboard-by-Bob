@@ -43,7 +43,7 @@ const OWNERS = [
   { name: 'Jennifer Martinez', email: 'jennifer.martinez@company.com' }
 ];
 
-const STATUSES = ['Open', 'In Progress', 'Pending', 'Closed', 'Cancelled'];
+const STATUSES = ['New', 'Assess', 'Authorize', 'Scheduled', 'Implement', 'Review', 'Closed', 'Cancelled'];
 const PRIORITIES = ['Critical', 'High', 'Medium', 'Low'];
 
 /**
@@ -290,11 +290,11 @@ Change Management Team`
     },
     {
       id: 'future-release',
-      name: 'Future Release Planning',
-      subject: 'Change Request [CHANGE_NUMBER] - Future Release Planning',
+      name: 'For Closure Confirmation',
+      subject: 'Change Request [CHANGE_NUMBER] - Closure Confirmation',
       body: `Dear [OWNER_NAME],
 
-We are reviewing change request [CHANGE_NUMBER] - "[TITLE]" for future release planning.
+We are reviewing change request [CHANGE_NUMBER] - "[TITLE]" for closure confirmation.
 
 Please confirm:
 1. Target release version/date

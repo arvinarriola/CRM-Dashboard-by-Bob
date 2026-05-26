@@ -261,7 +261,7 @@ function CrossCheckTab() {
                         <TableHead>
                           <TableRow>
                             <TableCell>Change Number</TableCell>
-                            <TableCell>Title</TableCell>
+                            <TableCell>Short Description</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Priority</TableCell>
                             <TableCell>Owner</TableCell>
@@ -312,7 +312,7 @@ function CrossCheckTab() {
                         <TableHead>
                           <TableRow>
                             <TableCell>Change Number</TableCell>
-                            <TableCell>Title</TableCell>
+                            <TableCell>Short Description</TableCell>
                             <TableCell>Status</TableCell>
                             <TableCell>Last Updated</TableCell>
                             <TableCell>Days Since Update</TableCell>
@@ -367,7 +367,7 @@ function CrossCheckTab() {
                         <TableHead>
                           <TableRow>
                             <TableCell>Change Number</TableCell>
-                            <TableCell>Title</TableCell>
+                            <TableCell>Short Description</TableCell>
                             <TableCell>Old Status</TableCell>
                             <TableCell>New Status</TableCell>
                             <TableCell>Owner</TableCell>

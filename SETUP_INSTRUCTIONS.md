@@ -141,7 +141,7 @@ The application includes:
 - **Mock email threads** (3-8 emails per CR)
 - **Historical data** for comparison
 - **4 email templates** for common scenarios
-- **All statuses**: Open, In Progress, Pending, Closed, Cancelled
+- **All statuses**: New, Assess, Authorize, Scheduled, Implement, Review, Closed, Cancelled
 - **All priorities**: Critical, High, Medium, Low
 - **Multiple categories**: Infrastructure, Application, Database, etc.
 

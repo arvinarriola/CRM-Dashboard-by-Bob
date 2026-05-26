@@ -195,9 +195,11 @@ function EmailDraftTab() {
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth size="small">
-                  <InputLabel>Select Template</InputLabel>
+                  <InputLabel id="template-select-label">Select Template</InputLabel>
                   <Select
+                    labelId="template-select-label"
                     value={selectedTemplate}
+                    label="Select Template"
                     onChange={(e) => {
                       setSelectedTemplate(e.target.value);
                       setCustomSubject('');
@@ -290,7 +292,7 @@ function EmailDraftTab() {
                   <TableRow>
                     <TableCell padding="checkbox">Select</TableCell>
                     <TableCell>Change Number</TableCell>
-                    <TableCell>Title</TableCell>
+                    <TableCell>Short Description</TableCell>
                     <TableCell>Owner</TableCell>
                     <TableCell>Email</TableCell>
                     <TableCell>Status</TableCell>
@@ -390,7 +392,15 @@ function EmailDraftTab() {
                 rows={12}
               />
               <Alert severity="info" sx={{ mt: 2 }}>
-                This email will be sent to {selectedCount} recipient(s)
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  This email will be sent to {selectedCount} recipient(s)
+                </Typography>
+                <Typography variant="body2">
+                  {selectedCount > 1
+                    ? `Each recipient will receive a personalized email with their specific change request details (change number, title, owner name, etc.). The preview above shows an example for the first selected change request.`
+                    : `This email will be sent to the change request owner with personalized details.`
+                  }
+                </Typography>
               </Alert>
             </Box>
           )}

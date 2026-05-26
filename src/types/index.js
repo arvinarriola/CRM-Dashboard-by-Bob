@@ -11,7 +11,7 @@
  * @property {string} description - Detailed description
  * @property {string} owner - Owner name
  * @property {string} ownerEmail - Owner email address
- * @property {'Open'|'In Progress'|'Pending'|'Closed'|'Cancelled'} status - Current status
+ * @property {'New'|'Assess'|'Authorize'|'Scheduled'|'Implement'|'Review'|'Closed'|'Cancelled'} status - Current status
  * @property {'Critical'|'High'|'Medium'|'Low'} priority - Priority level
  * @property {string} category - Category of change
  * @property {Date} createdDate - Creation date
@@ -19,7 +19,7 @@
  * @property {Date} [plannedStartDate] - Planned start date
  * @property {Date} [plannedEndDate] - Planned end date
  * @property {string} [comments] - User comments
- * @property {'Cancel'|'Close'|'Future'|'Action Required'} [actionCategory] - Action category
+ * @property {'Closure Confirmation'|'Pending Update'|'Action Required'|'Closed'|'Cancelled'} [actionCategory] - Action category
  * @property {boolean} [isDuplicate] - Duplicate flag
  * @property {boolean} [isOutdated] - Outdated flag
  * @property {EmailThread[]} [emailActivity] - Related email threads
@@ -55,14 +55,18 @@
  * @property {Object} statistics - Comparison statistics
  */
 
-export const STATUS_OPTIONS = ['Open', 'In Progress', 'Pending', 'Closed', 'Cancelled'];
+// Status options for both standard and normal change requests
+export const STATUS_OPTIONS = ['New', 'Assess', 'Authorize', 'Scheduled', 'Implement', 'Review', 'Closed', 'Cancelled'];
 export const PRIORITY_OPTIONS = ['Critical', 'High', 'Medium', 'Low'];
-export const ACTION_CATEGORIES = ['Cancel', 'Close', 'Future', 'Action Required'];
+export const ACTION_CATEGORIES = ['Closure Confirmation', 'Pending Update', 'Action Required', 'Closed', 'Cancelled'];
 
 export const STATUS_COLORS = {
-  'Open': '#2196F3',
-  'In Progress': '#FF9800',
-  'Pending': '#FFC107',
+  'New': '#2196F3',
+  'Assess': '#9C27B0',
+  'Authorize': '#3F51B5',
+  'Scheduled': '#00BCD4',
+  'Implement': '#FF9800',
+  'Review': '#FFC107',
   'Closed': '#4CAF50',
   'Cancelled': '#9E9E9E'
 };

@@ -30,6 +30,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ClearIcon from '@mui/icons-material/Clear';
+import CommentIcon from '@mui/icons-material/Comment';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, ACTION_CATEGORIES, STATUS_COLORS, PRIORITY_COLORS } from '../../types';
 import useStore from '../../store/useStore';
 import { format } from 'date-fns';
@@ -39,6 +41,11 @@ function ReviewTab() {
   const [editComment, setEditComment] = useState('');
   const [editActionCategory, setEditActionCategory] = useState('');
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [commentDialogOpen, setCommentDialogOpen] = useState(false);
+  const [selectedComment, setSelectedComment] = useState('');
+  const [selectedChangeRequest, setSelectedChangeRequest] = useState(null);
+  const [isEditingInDialog, setIsEditingInDialog] = useState(false);
+  const [dialogEditComment, setDialogEditComment] = useState('');
   
   const changeRequests = useStore((state) => state.changeRequests);
   const filters = useStore((state) => state.filters);
@@ -80,6 +87,34 @@ function ReviewTab() {
   const handleClearFilters = () => {
     resetFilters();
     setSuccessMessage('Filters cleared');
+  };
+
+  const handleViewComment = (comment, changeRequest) => {
+    setSelectedComment(comment || 'No comments');
+    setSelectedChangeRequest(changeRequest);
+    setDialogEditComment(comment || '');
+    setIsEditingInDialog(false);
+    setCommentDialogOpen(true);
+  };
+
+  const handleStartEditInDialog = () => {
+    setIsEditingInDialog(true);
+  };
+
+  const handleSaveDialogEdit = () => {
+    if (selectedChangeRequest) {
+      updateChangeRequest(selectedChangeRequest.id, {
+        comments: dialogEditComment
+      });
+      setSelectedComment(dialogEditComment);
+      setIsEditingInDialog(false);
+      setSuccessMessage('Comment updated successfully');
+    }
+  };
+
+  const handleCancelDialogEdit = () => {
+    setDialogEditComment(selectedComment);
+    setIsEditingInDialog(false);
   };
 
   const activeFilterCount = 
@@ -181,7 +216,7 @@ function ReviewTab() {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 600 }}>Change Number</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>Title</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Short Description</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Owner</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Priority</TableCell>
@@ -251,7 +286,7 @@ function ReviewTab() {
                           )
                         )}
                       </TableCell>
-                      <TableCell sx={{ maxWidth: 300 }}>
+                      <TableCell sx={{ maxWidth: 200 }}>
                         {editingId === cr.id ? (
                           <TextField
                             fullWidth
@@ -263,14 +298,25 @@ function ReviewTab() {
                             placeholder="Add comments..."
                           />
                         ) : (
-                          <Tooltip title={cr.comments || 'No comments'}>
-                            <Typography variant="body2" noWrap>
-                              {cr.comments || '-'}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" noWrap sx={{ flex: 1, maxWidth: 150 }}>
+                              {cr.comments ? cr.comments.substring(0, 30) + (cr.comments.length > 30 ? '...' : '') : '-'}
                             </Typography>
-                          </Tooltip>
+                            {cr.comments && (
+                              <Tooltip title="View full comment">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleViewComment(cr.comments, cr)}
+                                  sx={{ p: 0.5 }}
+                                >
+                                  <VisibilityIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </Box>
                         )}
                       </TableCell>
-                      <TableCell align="center">
+                      <TableCell sx={{ width: 100 }}>
                         {editingId === cr.id ? (
                           <Box>
                             <Tooltip title="Save">
@@ -394,6 +440,45 @@ function ReviewTab() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setFilterDialogOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Comment View Dialog */}
+      <Dialog open={commentDialogOpen} onClose={() => setCommentDialogOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Comment Details</DialogTitle>
+        <DialogContent>
+          {isEditingInDialog ? (
+            <TextField
+              fullWidth
+              multiline
+              rows={8}
+              value={dialogEditComment}
+              onChange={(e) => setDialogEditComment(e.target.value)}
+              placeholder="Add your comments here..."
+              sx={{ mt: 2 }}
+            />
+          ) : (
+            <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mt: 2 }}>
+              {selectedComment}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          {isEditingInDialog ? (
+            <>
+              <Button onClick={handleCancelDialogEdit}>Cancel</Button>
+              <Button onClick={handleSaveDialogEdit} variant="contained" startIcon={<SaveIcon />}>
+                Save
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={handleStartEditInDialog} startIcon={<EditIcon />} variant="contained">
+                Edit
+              </Button>
+              <Button onClick={() => setCommentDialogOpen(false)}>Close</Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </Box>

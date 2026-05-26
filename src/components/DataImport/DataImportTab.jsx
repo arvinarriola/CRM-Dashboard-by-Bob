@@ -17,12 +17,16 @@ import {
   TableHead,
   TableRow,
   IconButton,
-  Tooltip
+  Tooltip,
+  Collapse,
+  Checkbox
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DataObjectIcon from '@mui/icons-material/DataObject';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { parseExcelFile } from '../../utils/excelParser';
 import useStore from '../../store/useStore';
 import { format } from 'date-fns';
@@ -31,11 +35,15 @@ function DataImportTab() {
   const [serviceNowUrl, setServiceNowUrl] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [previewData, setPreviewData] = useState(null);
+  const [serviceNowExpanded, setServiceNowExpanded] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [historicalFilesExpanded, setHistoricalFilesExpanded] = useState(false);
   
   const changeRequests = useStore((state) => state.changeRequests);
   const historicalFiles = useStore((state) => state.historicalFiles);
   const importChangeRequests = useStore((state) => state.importChangeRequests);
   const addHistoricalFile = useStore((state) => state.addHistoricalFile);
+  const removeHistoricalFile = useStore((state) => state.removeHistoricalFile);
   const setSuccessMessage = useStore((state) => state.setSuccessMessage);
   const setError = useStore((state) => state.setError);
   const setLoading = useStore((state) => state.setLoading);
@@ -87,6 +95,36 @@ function DataImportTab() {
     setPreviewData(null);
   };
 
+  const handleSelectFile = (index) => {
+    setSelectedFiles(prev =>
+      prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]
+    );
+  };
+
+  const handleSelectAllFiles = (event) => {
+    if (event.target.checked) {
+      setSelectedFiles(historicalFiles.map((_, index) => index));
+    } else {
+      setSelectedFiles([]);
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedFiles.length === 0) {
+      setError('Please select files to delete');
+      return;
+    }
+    
+    // Sort in descending order to delete from end to start (to maintain correct indices)
+    const sortedIndices = [...selectedFiles].sort((a, b) => b - a);
+    sortedIndices.forEach(index => {
+      removeHistoricalFile(index);
+    });
+    
+    setSuccessMessage(`${selectedFiles.length} file(s) deleted successfully`);
+    setSelectedFiles([]);
+  };
+
   const statistics = {
     totalRecords: changeRequests.length,
     historicalFiles: historicalFiles.length,
@@ -104,28 +142,38 @@ function DataImportTab() {
         {/* ServiceNow URL Input */}
         <Grid item xs={12}>
           <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Import from ServiceNow
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Enter a ServiceNow filter URL to import change requests (Demo: uses mock data)
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField
-                fullWidth
-                placeholder="https://instance.service-now.com/change_request_list.do?..."
-                value={serviceNowUrl}
-                onChange={(e) => setServiceNowUrl(e.target.value)}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: serviceNowExpanded ? 2 : 0 }}>
+              <Typography variant="h6">
+                Import from ServiceNow
+              </Typography>
+              <IconButton
+                onClick={() => setServiceNowExpanded(!serviceNowExpanded)}
                 size="small"
-              />
-              <Button
-                variant="contained"
-                onClick={handleServiceNowUrlSubmit}
-                startIcon={<DataObjectIcon />}
               >
-                Load Data
-              </Button>
+                {serviceNowExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
             </Box>
+            <Collapse in={serviceNowExpanded}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Enter a ServiceNow filter URL to import change requests (Demo: uses mock data)
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  fullWidth
+                  placeholder="https://instance.service-now.com/change_request_list.do?..."
+                  value={serviceNowUrl}
+                  onChange={(e) => setServiceNowUrl(e.target.value)}
+                  size="small"
+                />
+                <Button
+                  variant="contained"
+                  onClick={handleServiceNowUrlSubmit}
+                  startIcon={<DataObjectIcon />}
+                >
+                  Load Data
+                </Button>
+              </Box>
+            </Collapse>
           </Paper>
         </Grid>
 
@@ -181,6 +229,87 @@ function DataImportTab() {
             </Button>
           </Paper>
         </Grid>
+
+        {/* Uploaded Historical Files List */}
+        {historicalFiles.length > 0 && (
+          <Grid item xs={12}>
+            <Paper sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h6">
+                    Uploaded Historical Files ({historicalFiles.length})
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    onClick={() => setHistoricalFilesExpanded(!historicalFilesExpanded)}
+                  >
+                    {historicalFilesExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </IconButton>
+                </Box>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  onClick={handleDeleteSelected}
+                  disabled={selectedFiles.length === 0}
+                >
+                  Delete Selected ({selectedFiles.length})
+                </Button>
+              </Box>
+              <Collapse in={historicalFilesExpanded}>
+                <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          checked={selectedFiles.length === historicalFiles.length && historicalFiles.length > 0}
+                          indeterminate={selectedFiles.length > 0 && selectedFiles.length < historicalFiles.length}
+                          onChange={handleSelectAllFiles}
+                        />
+                      </TableCell>
+                      <TableCell>File Name</TableCell>
+                      <TableCell align="right">Records</TableCell>
+                      <TableCell align="center">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {historicalFiles.map((file, index) => (
+                      <TableRow key={index} hover>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={selectedFiles.includes(index)}
+                            onChange={() => handleSelectFile(index)}
+                          />
+                        </TableCell>
+                        <TableCell>{file.name}</TableCell>
+                        <TableCell align="right">
+                          <Chip label={file.data.length} size="small" color="primary" />
+                        </TableCell>
+                        <TableCell align="center">
+                          <Tooltip title="Delete file">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={() => {
+                                removeHistoricalFile(index);
+                                setSuccessMessage(`File "${file.name}" deleted`);
+                                setSelectedFiles(prev => prev.filter(i => i !== index).map(i => i > index ? i - 1 : i));
+                              }}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              </Collapse>
+            </Paper>
+          </Grid>
+        )}
 
         {/* Statistics Cards */}
         <Grid item xs={12}>
@@ -293,7 +422,7 @@ function DataImportTab() {
                   <TableHead>
                     <TableRow>
                       <TableCell>Change Number</TableCell>
-                      <TableCell>Title</TableCell>
+                      <TableCell>Short Description</TableCell>
                       <TableCell>Owner</TableCell>
                       <TableCell>Status</TableCell>
                       <TableCell>Priority</TableCell>

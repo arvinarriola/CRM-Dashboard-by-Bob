@@ -81,6 +81,12 @@ const useStore = create((set, get) => ({
     set({ historicalFiles });
   },
   
+  // Remove historical file
+  removeHistoricalFile: (index) => {
+    const historicalFiles = get().historicalFiles.filter((_, i) => i !== index);
+    set({ historicalFiles });
+  },
+  
   // Update a single change request
   updateChangeRequest: (id, updates) => {
     const changeRequests = get().changeRequests.map(cr =>

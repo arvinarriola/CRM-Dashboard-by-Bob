@@ -43,25 +43,23 @@ function ExportTab() {
   const statistics = useMemo(() => getStatistics(), [changeRequests]);
 
   const getFilteredData = () => {
-    if (includeFilters.all) {
-      return changeRequests;
+    let filtered = changeRequests;
+
+    // Apply filters based on selected options
+    if (includeFilters.withComments) {
+      filtered = filtered.filter(cr => cr.comments && cr.comments.trim());
+    }
+    if (includeFilters.outdated) {
+      filtered = filtered.filter(cr => cr.isOutdated);
+    }
+    if (includeFilters.duplicates) {
+      filtered = filtered.filter(cr => cr.isDuplicate);
+    }
+    if (includeFilters.contacted) {
+      filtered = filtered.filter(cr => cr.contacted);
     }
 
-    return changeRequests.filter(cr => {
-      if (includeFilters.withComments && (!cr.comments || !cr.comments.trim())) {
-        return false;
-      }
-      if (includeFilters.outdated && !cr.isOutdated) {
-        return false;
-      }
-      if (includeFilters.duplicates && !cr.isDuplicate) {
-        return false;
-      }
-      if (includeFilters.contacted && !cr.contacted) {
-        return false;
-      }
-      return true;
-    });
+    return filtered;
   };
 
   const handleExport = () => {
@@ -83,14 +81,17 @@ function ExportTab() {
 
   const handleFilterChange = (filter) => {
     if (filter === 'all') {
+      // Toggle all filters off when clicking "All Records"
+      const newAllState = !includeFilters.all;
       setIncludeFilters({
-        all: true,
+        all: newAllState,
         withComments: false,
         outdated: false,
         duplicates: false,
         contacted: false
       });
     } else {
+      // When selecting a specific filter, uncheck "All Records"
       setIncludeFilters({
         ...includeFilters,
         all: false,
@@ -284,7 +285,6 @@ function ExportTab() {
                       <Checkbox
                         checked={includeFilters.withComments}
                         onChange={() => handleFilterChange('withComments')}
-                        disabled={includeFilters.all}
                       />
                     }
                     label={`Only With Comments (${statistics.withComments})`}
@@ -294,7 +294,6 @@ function ExportTab() {
                       <Checkbox
                         checked={includeFilters.outdated}
                         onChange={() => handleFilterChange('outdated')}
-                        disabled={includeFilters.all}
                       />
                     }
                     label={`Only Outdated (${statistics.outdated})`}
@@ -304,7 +303,6 @@ function ExportTab() {
                       <Checkbox
                         checked={includeFilters.duplicates}
                         onChange={() => handleFilterChange('duplicates')}
-                        disabled={includeFilters.all}
                       />
                     }
                     label={`Only Duplicates (${statistics.duplicates})`}
@@ -314,7 +312,6 @@ function ExportTab() {
                       <Checkbox
                         checked={includeFilters.contacted}
                         onChange={() => handleFilterChange('contacted')}
-                        disabled={includeFilters.all}
                       />
                     }
                     label={`Only Contacted (${statistics.contacted})`}

@@ -134,7 +134,7 @@ Your Excel file should contain these columns (column names are flexible):
 | Title | Short description | Database Migration |
 | Owner | Assigned person | John Smith |
 | Owner Email | Contact email | john.smith@company.com |
-| Status | Current status | Open, In Progress, Closed |
+| Status | Current status | New, Assess, Authorize, Scheduled, Implement, Review, Closed, Cancelled |
 | Priority | Priority level | Critical, High, Medium, Low |
 | Category | Change category | Infrastructure, Application |
 | Created Date | Creation date | 2024-01-15 |
