@@ -103,9 +103,15 @@ This application includes comprehensive security guard rails to protect your Out
    npm run dev
    ```
 
-4. **Open your browser**
-   - The application will automatically open at `http://localhost:3000`
-   - If not, manually navigate to the URL shown in the terminal
+4. **Prepare a production demo build**
+   ```bash
+   npm run deploy:prepare
+   ```
+
+5. **Open your browser**
+   - For local development, the application opens at the Vite URL shown in the terminal
+   - In CodeSandbox, use the generated preview URL
+   - For a public shareable demo, deploy the production build from `dist/` via GitHub Pages, Netlify, or Vercel
 
 ## 📖 How to Use
 
@@ -218,6 +224,7 @@ change-manager-dashboard/
 ├── index.html
 ├── package.json
 ├── vite.config.js
+├── dist/                     # Production build output after `npm run deploy:prepare`
 └── README.md
 ```
 

@@ -39,9 +39,11 @@ Since npm is not currently available in your environment, here are alternative w
 ### Using CodeSandbox (Instant, No Installation)
 
 1. Go to https://codesandbox.io/
-2. Click "Create Sandbox" → "React"
+2. Create or import the project as a Vite React app
 3. Upload all project files
-4. The application will run automatically
+4. If preview is blocked, allow CodeSandbox hosts in `vite.config.js`
+5. Use the generated preview URL for testing
+6. For a public demo anyone can access, deploy the production build to GitHub Pages, Netlify, or Vercel
 
 ## Option 3: Manual Setup with CDN (No Build Tools)
 
@@ -109,8 +111,10 @@ change-manager-dashboard/
 1. **Install Node.js** from https://nodejs.org/
 2. **Open terminal** in the project directory
 3. **Run**: `npm install`
-4. **Run**: `npm run dev`
-5. **Open browser** to http://localhost:3000
+4. **Run locally**: `npm run dev`
+5. **Create production demo build**: `npm run deploy:prepare`
+6. **Deploy the `dist/` folder** using GitHub Pages, Netlify, or Vercel
+7. **Share the public deployment URL**
 
 ## Features Ready to Demo
 
@@ -139,8 +143,9 @@ Once running, you can immediately:
 - Or kill the process using port 3000
 
 ### If browser doesn't open:
-- Manually navigate to http://localhost:3000
-- Check terminal for the actual URL
+- Manually navigate to the URL shown in the terminal
+- In CodeSandbox, use the generated preview URL instead of assuming localhost
+- If CodeSandbox says the host is blocked, update `server.allowedHosts` in `vite.config.js`
 
 ## Demo Data
 
